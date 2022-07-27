@@ -13,10 +13,12 @@ void error(const char *msg)
 	exit(0);
 }
 
-void check_exit(char* buffer)
+void check_exit(char* buffer, int* sockfd)
 {
     if(strcmp(buffer, "exit") == 0)
     {    
+        printf("Coonection Terminated\n");
+        close(*sockfd);
         exit(1);
     }
 }
@@ -66,7 +68,7 @@ int main(int argc, char *argv[])
 		
         n = write(sockfd, buffer, strlen(buffer));
         buffer[strcspn(buffer, "\n")] = 0;
-        check_exit(buffer);
+        check_exit(buffer, &sockfd);
 
         if (n < 0)
 			error("ERROR writing to socket");
@@ -75,7 +77,7 @@ int main(int argc, char *argv[])
 		
         n = read(sockfd, buffer, 256);
 		buffer[strcspn(buffer, "\n")] = 0;
-        check_exit(buffer);
+        check_exit(buffer, &sockfd);
         if (n < 0)
 			error("ERROR reading from socket");
 		printf("Server : %s\n", buffer);

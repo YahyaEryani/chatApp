@@ -12,10 +12,13 @@ void error(const char *msg)
     exit(1);
 }
 
-void check_exit(char* buffer)
+void check_exit(char* buffer, int* newsockfd, int* sockfd)
 {
     if(strcmp(buffer, "exit") == 0)
     {    
+        printf("Coonection Terminated\n");
+        close(*newsockfd);
+        close(*sockfd);
         exit(1);
     }
 }
@@ -62,7 +65,8 @@ int main(int argc, char *argv[])
         bzero(buffer, 256);
         n = read(newsockfd, buffer, 256);
         buffer[strcspn(buffer, "\n")] = 0;
-        check_exit(buffer);
+        check_exit(buffer, &newsockfd, &sockfd);
+
         if (n < 0)
             error("ERROR reading from socket");
 
@@ -72,13 +76,11 @@ int main(int argc, char *argv[])
         fgets(buffer, 256, stdin);
         n = write(newsockfd, buffer, strlen(buffer));
         buffer[strcspn(buffer, "\n")] = 0;
-        check_exit(buffer);
+        check_exit(buffer, &newsockfd, &sockfd);
         if (n < 0)
             error("ERROR writing to socket");
     } /* end of while */
 
 
-    close(newsockfd);
-    close(sockfd);
     return 0; /* we never get here */
 }
